@@ -1,9 +1,8 @@
-aws_access_key_id='AKIAILXLBSRPY54JL24A'
-aws_secret_access_key='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'
-# Get the Keypair in the EC2 Dashboard page.
-keyPairFile="/Users/lige/Dropbox/cs/cse291/UCSD_BigData/LocalScripts/cse291nv.pem" # name of file keeping local key
-key_name="cse291nv" # name of keypair (not name of file where key is stored)
-# Set the security group On the EC2 page (You will need to add IP addresses if
-# you want to connect from a place previously unauthorized.
+import os
+__dirname = os.path.dirname(os.path.abspath(__file__))
+
+aws_access_key_id = 'AKIAILXLBSRPY54JL24A'
+aws_secret_access_key = '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'
+keyPairFile = os.path.join(__dirname, 'cse291nv.pem')
+key_name = "cse291nv"
 security_groups=['launch-wizard-1']
-### End of AWS credentials ####
