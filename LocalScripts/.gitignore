@@ -1,0 +1,4 @@
+*.pyc
+AWSCredentials.py
+cse291nv.pem
+rootkey.csv
