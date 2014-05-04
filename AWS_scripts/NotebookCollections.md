@@ -1,4 +1,11 @@
 ## Notebooks created For Big Data Course ##
+
+#### __[mrjob]__ UCSD_BigData/notebooks/mrjob// ####
+Notebooks using mrjob to run map-reduce jobs
+
+####  __[sorting]__  UCSD_BigData/notebooks/sorting/ ####
+A notebook about sorting and it's application in map-reduce and in random sampling
+
 ####  __[P-values]__  UCSD_BigData/notebooks/P-values/ ####
 A variant of the weather notebook that includes a correction to a mistake and the computation of different p-values for the correlation between variables.
 
