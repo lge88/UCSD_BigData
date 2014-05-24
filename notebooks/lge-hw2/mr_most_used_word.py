@@ -21,7 +21,8 @@ class MRMostUsedWord(MRJob):
     stderr.write('reducer: ' + key + ': ' + str(val_list) + '\n')
     yield None, (sum(val_list), key)
 
-  def reducer_find_most_freq_word(self, _, values):
+  def reducer_find_most_freq_word(self, key, values):
+    stderr.write('key:' + str(key) + '\n')
     occurrence, most_freq_word = max(values)
     yield most_freq_word, occurrence
 

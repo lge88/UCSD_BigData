@@ -1,0 +1,139 @@
+
+from mrjob.job import MRJob
+from sys import stderr
+from weather_data_parser import WeatherDataParser
+
+def add_to_matrix(m, other):
+  rows = len(m)
+  cols = len(m[0])
+
+  for i in range(rows):
+    for j in range(cols):
+      m[i][j] += m[i][j] + other[i][j]
+
+def outer_product(v1, v2):
+ # compute m = v1 * v2^T (M x N)
+  M = len(v1)
+  N = len(v2)
+  m = []
+  for i in range(M):
+    row = []
+    for j in range(N):
+      xi = x[i]
+      xj = x[j]
+      row.append(xi * xj)
+    m.append(row)
+  return m
+
+class MRPCA(MRJob):
+
+  station_to_node = None
+  parser = None
+
+  def parse_line(self, line):
+    return MRPCA.parser.parse_line(line)
+
+  def encode(self, x):
+    return x
+
+  def decode(self, x):
+    return x
+
+  def concat_tmin_tmax_mapper(self, _, line):
+    res = self.parse_line(line)
+
+    # stderr.write('line: ' + line + '\n')
+    if res is not None:
+      station, year, measurement, vec, _ = res
+      if measurement == 'TMAX' or measurement == 'TMIN':
+        key = station + ':' + str(year)
+        # stderr.write('key: ' + key + '\n')
+        # self.increment_counter('mapper', station)
+        yield key, (measurement, vec)
+
+  def concat_tmin_tmax_reducer(self, key, vals):
+
+    # vals = list(vals)
+    # stderr.write('key: ' + key + '\n')
+    # stderr.write('vals: ' + str(vals) + '\n')
+
+    out = None
+    for v in vals:
+      if out is None:
+        out = v[1]
+      else:
+        if v[0] == 'TMIN':
+          out = v[1] + out
+        else:
+          out = out + v[1]
+        # stderr.write(key + ' is done.\n')
+        yield key, out
+
+  def steps(self):
+    return [
+      self.mr(mapper=self.concat_tmin_tmax_mapper,
+              reducer=self.concat_tmin_tmax_reducer)
+    ]
+  # def mapper(self, _, line):
+  #   # parse line to get station_id and vector x (1 x 365)
+  #   res = self.parse_line(line)
+  #   if res is not None:
+  #     station, year, measurement, x = res
+
+  #     node = MRPCA.station_to_node[station]
+
+  #     if measurement == 'TMIN':
+  #       yield node, [0.0] * 365 + x
+  #     elif measurement == 'TMAX':
+  #       yield node, x + [0.0] * 365
+  #     else:
+  #       pass
+
+  #     # compute m = x * x^T (365 x 365)
+  #     m = outer_product(x, x)
+
+  #     # emit station_id, m pair
+  #     yield node, self.encode(m)
+
+  # def combiner(self, station, matrices):
+  #   # sum matrices element-wise
+  #   # emit station_id, matrix pair
+  #   res = None
+  #   for m in matrices:
+  #     m  = self.decode(m)
+
+  #     if res is None:
+  #       res = m
+  #     else:
+  #       add_to_matrix(res, m)
+  #   yield station, res
+
+  # def reducer(self, station_id, matrices):
+  #   # sum matrices element-wise
+  #   res = None
+  #   for m in matrices:
+  #     if res is None:
+  #       res = m
+  #     else:
+  #       add_to_matrix(res, m)
+
+
+    # for each station, compute the eigen values of the aggrate matrix
+
+    # for each station, yield k (num of reduced dimension) alpha (1 x 365)
+
+    # MOL (Min O.. L..) principle
+    # - what level of complexity
+    # - how many eigen-vectors to use
+    # pass
+
+  # def steps(self):
+  #   return [
+  #   ]
+
+
+if __name__ == '__main__':
+  # MRPCA.station_to_node = read_station_to_node_table('station-to-node-table-yoav.txt')
+  MRPCA.parser = WeatherDataParser(selected_days = range(5))
+  # print MRPCA.station_to_node
+  MRPCA.run()
