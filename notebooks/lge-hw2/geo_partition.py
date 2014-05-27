@@ -91,11 +91,14 @@ def partition(stations):
   # build kd-tree from stations
   return root
 
+
+
 if __name__ == '__main__':
+  pass
   # stations = read_csv('station-lat-lon-weight.csv')
   # sort_stations_by_lat(stations)
   # print find_weighted_median(stations)
 
-  station_to_node = StationToNodeTable()
-  station_to_node.read_from_csv_file('station-to-node-table-yoav.csv')
-  station_to_node.print_sample()
+  # station_to_node = StationToNodeTable()
+  # station_to_node.read_from_csv_file('station-to-node-table-yoav.csv')
+  # station_to_node.print_sample()

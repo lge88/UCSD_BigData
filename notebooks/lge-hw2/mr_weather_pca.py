@@ -64,7 +64,7 @@ class MRPCA(MRJob):
     self.station_to_node_table.read_from_csv_file(basename(self.options.station_to_node))
 
   def node_mapper(self, key, vec):
-    self.debug('in mapper 1, key ' + key)
+    # self.debug('in mapper 1, key ' + key)
 
     station, year = key.split(':')
     leaf = self.station_to_node_table.find_node(station)
@@ -84,7 +84,7 @@ class MRPCA(MRJob):
         yield node, vec
 
   def node_mean_reducer(self, node, vecs):
-    self.debug('in mean reducer, node ' + node)
+    # self.debug('in mean reducer, node ' + node)
 
     mu, n = None, 0
     for vec in vecs:
@@ -96,7 +96,7 @@ class MRPCA(MRJob):
     mu /= n
 
   def node_substract_mean_reducer(self, node, vecs):
-    self.debug('in reducer 1, node ' + node)
+    # self.debug('in reducer 1, node ' + node)
 
     # I hope vecs can be hold in memory, but no :(
     # It will complain memory problem.
@@ -132,7 +132,7 @@ class MRPCA(MRJob):
     remove(fname)
 
   def node_descriptor_reducer(self, node, vals):
-    self.debug('in reducer 2, node ' + node)
+    # self.debug('in reducer 2, node ' + node)
 
     cov = None
     mu = None

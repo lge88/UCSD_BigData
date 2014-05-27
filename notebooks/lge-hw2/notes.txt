@@ -1,0 +1,102 @@
+github ids:
+czarifis
+dlisuk
+elgehelge
+intermilan
+nimning
+panagosg7
+semihyavuzz
+stream101
+wchuan
+woerns
+
+lecture 2014-5-20:
+1. Measure of no of measurements.
+   station, lon, lat, weight(based on number of `good' measurements)
+
+2. Create a partition tree.
+   Based on num of measurements instead of num of stations.
+
+3. Going back to data, compute cov and mean.
+   For each leaf in the tree, compute cov and mean.
+   Map: take outer product. Key = the index of leaf in tree.
+   Combine/reduce: sum the count, vectors, outer products.
+
+1. Compute PCA for each leaf.
+   Compute percentage of variance explained?.
+   TMAX `concat` TMIN, dimension of 2*365.
+
+   for each leaf find the #eigenvectors that explains c% of variance.
+
+Description length using model.
+   Per node description:
+   x = mu + sum of (alpha*vec) from 1 to k, where k is #eigenvectors
+   365*2 - length of vector
+   n - number of samples
+   total: (k + 1) * 2 * 365 + k * n << 2 * 365 * n
+
+   class NodeDescriptor {
+    public:
+     NodeDescriptor(mu, alpha, eigenvec);
+     int size() {
+         int k = alpha.size(), n = alpha[0].size();
+         return (k + 1) * 2 * 365 + k * n;
+     }
+     double mu;
+     vector<vector<doulbe> > alpha; // k*n
+     vector<vector<doulbe> > eigenvec; // k*2*365
+     static NodeDescriptor combine(const NodeDescriptor& n1, const NodeDescriptor& n2);
+   }
+
+   NodeDescriptor n3 = combine(n1, n2);
+   if (n3.size() < n1.size() + n2.size()) { //SHOULD MERGE, but how to merge? }
+
+   principle of MDL(Minimun Description Length)
+
+
+Suppose you want the median of a very large data.
+Sample n points take that median.
+
+Glivenco-Cantelli Theorem
+
+- F(x) true CDF
+- Fn(x) CDF from sample of size n.
+
+Pr(sup|F(x) - Fn(x)| > eps) <= 2 exp(-2*n*eps^2)
+
+Proof:
+Take 2 sample of size n.
+
+Streaming algorithms:
+  Only see each item once.
+
+Suppose we get a stream of URLs, each URL appears 1 or 2 times.
+What fraction of URLs appear twice?
+
+S - appear once
+D - appear twice
+what is D/(D + S)
+
+- Take a sample and count?
+
+  Suppose we sample with prob of 1/10, if URL appears once what prob
+  if appears is sample 1/10.
+
+  If URL appears twice
+     what prob that both appear
+
+
+- Do I see this element before?
+- bloom filter
+
+- Estimate how many different elements
+
+  for each item x compute i = H(x)
+
+  # i = 111000010101000 (bits)
+                    ^-^ z(i)
+  keep sofar = max(z(i))
+  estimate = 2 ^ sofar
+
+  do multiple times, and do some combination, simple mean and median
+  do not do well!
