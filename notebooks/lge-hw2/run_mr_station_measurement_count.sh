@@ -10,6 +10,7 @@ if [[ $MODE == 'emr' ]]; then
   python mr_station_measurement_count.py -r emr \
     --emr-job-flow-id ${JOB_FLOW_ID} \
     -c ~/.mrjob.conf \
+    --setup 'export PYTHONPATH=$PYTHONPATH:weather_data_parser.tar.gz#/' \
     s3://lge-bucket/weather-data/weather.csv > data/station-measurement-counts.txt
 else
   python mr_station_measurement_count.py \

@@ -43,5 +43,5 @@ def load_pickle_data(filename):
 
 if __name__ == '__main__':
   s1 = load_pickle_data('stations.pkl')
-  s2 = join_stations_measurement_counts('station-measurement-counts.txt', s1)
-  export_text_data(s2, 'station-lat-lon-weight.csv.txt')
+  s2 = join_stations_measurement_counts('data/station-measurement-counts.txt', s1)
+  export_text_data(s2, 'data/station-lat-lon-weight.csv')
