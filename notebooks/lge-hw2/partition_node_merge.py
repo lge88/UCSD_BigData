@@ -7,6 +7,7 @@ class Node:
     self.coord = str(coord)
     self.thres = float(thres)
     self.should_merge = bool(should_merge);
+    self.group = 0;
 
   def __repr__(self):
     return self.to_csv_line()
@@ -34,7 +35,8 @@ class Node:
       self.k,
       self.nsamples,
       self.desc_len,
-      '1' if self.should_merge else '0'
+      self.group
+      # '1' if self.should_merge else '0'
     ])
     return ','.join(l)
 
@@ -86,14 +88,24 @@ def compute_nodes_should_be_merged(nodes_dict, num_levels):
     compute_whether_children_of_nodes_should_be_merged_at_level(nodes_dict, i)
   return nodes_dict
 
+def compute_nodes_groups(nodes_dict):
+  nodes = [v for k, v in nodes_dict.items()]
+
+  for node in nodes:
+    nid = node.parent(nodes_dict).left_child(nodes_dict).id if node.should_merge else node.id
+    gid = int(nid, 2) + 1 if nid != '' else 0
+    node.group = gid
+
+
 if __name__ == '__main__':
   fin_name_1 = 'data/node-descriptor-k-n-dl-1-of-100.csv'
   fin_name_2 = 'data/partition-tree-yoav.csv'
-  fout_name = 'data/partition-tree-nid-coord-thres-k-n-dl-m-1-of-100.csv'
+  fout_name = 'data/partition-tree-nid-coord-thres-k-n-dl-gid-1-of-100.csv'
   num_levels = 9
 
   nodes_dict = read_node_descriptors_from_csv(fin_name_1)
   join_node_spatial_info_from_csv(nodes_dict, fin_name_2)
   compute_nodes_should_be_merged(nodes_dict, num_levels)
+  compute_nodes_groups(nodes_dict)
 
   write_nodes_to_csv(nodes_dict, fout_name)

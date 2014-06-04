@@ -100,3 +100,27 @@ what is D/(D + S)
 
   do multiple times, and do some combination, simple mean and median
   do not do well!
+
+  Divide the set in to groups,
+
+- Comparing similar documents
+  similarity:
+  - consider the set of words
+  - consider the set of consecutive word pairs
+
+- Min-Hash algorithm
+  Fix k Hash function
+  for each doc compute k minhash values:
+      keep only signature
+
+  To compute similarity compare signatures
+      count the number of equal min-hash
+
+- Sketches ~~ Sufficient Statistics
+
+  for normal dist suff. stat. are mu and sigma
+
+- For the class of normal dist
+  mu, sigma hold all the information for computing likelihood
+
+  likelihood?
