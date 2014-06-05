@@ -124,3 +124,6 @@ what is D/(D + S)
   mu, sigma hold all the information for computing likelihood
 
   likelihood?
+
+- Kolmogorov Complexity: a seq is random if there is no program
+  generating it that is shorter than the seq.
