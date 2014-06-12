@@ -152,29 +152,36 @@ class MRPCA(MRJob):
     cov /= nsamples
 
     ratio = self.options.explained_variance_ratio_threshold
-    U, D, V = svd(cov)
-    k, sofar, total = 1, 0.0, sum(D)
-    sofar += D[k-1]
-    while sofar < ratio * total:
-      k += 1
+
+    ok = True
+    try:
+      U, D, V = svd(cov)
+    except:
+      ok = False
+
+    if ok:
+      k, sofar, total = 1, 0.0, sum(D)
       sofar += D[k-1]
+      while sofar < ratio * total:
+        k += 1
+        sofar += D[k-1]
 
-    desc_len = nsamples * k + (k + 1) * 730
+      desc_len = nsamples * k + (k + 1) * 730
 
-    # Dimension reduced descriptor for node.
-    # Only care about decriptor length
-    out = [node, k, nsamples, desc_len]
+      # Dimension reduced descriptor for node.
+      # Only care about decriptor length
+      out = [node, k, nsamples, desc_len]
 
-    # Full descriptor, output might be huge.
-    # by default is not stored. But can be enabled.
-    if self.options.store_mu:
-      out.append(mu.tolist())
+      # Full descriptor, output might be huge.
+      # by default is not stored. But can be enabled.
+      if self.options.store_mu:
+        out.append(mu.tolist())
 
-    if self.options.store_eigen_vectors:
-      out.append(D[:k].tolist())
-      out.append(U[:, :k].tolist())
+      if self.options.store_eigen_vectors:
+        out.append(D[:k].tolist())
+        out.append(U[:, :k].tolist())
 
-    yield None, out
+      yield None, out
 
   def steps(self):
     return [

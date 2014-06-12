@@ -10,6 +10,8 @@ class MRTestNumpy(MRJob):
   ERR_REPORTED = False
 
   def mapper(self, key, vec):
+
+    A, b, r_v, p_v, std_err = linregress(a, b)
     station, year = key.split(':')
     try:
       mu = np.mean(vec)
@@ -31,6 +33,7 @@ class MRTestNumpy(MRJob):
 if __name__ == '__main__':
   try:
     import numpy as np
+    from scipy.stats import linregress
   except Exception, e:
     MRTestNumpy.ERR = e
 
