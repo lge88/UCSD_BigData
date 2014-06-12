@@ -35,8 +35,8 @@ class Node:
       self.k,
       self.nsamples,
       self.desc_len,
-      self.group
-      # '1' if self.should_merge else '0'
+      # self.group
+      '1' if self.should_merge else '0'
     ])
     return ','.join(l)
 
@@ -67,12 +67,18 @@ def write_nodes_to_csv(nodes_dict, fname):
       f.write(n.to_csv_line())
       f.write('\n')
 
+def write_node_pairs_should_merge_to_csv(nodes_pairs, fname):
+  with open(fname, 'w') as f:
+    for p in nodes_pairs:
+      f.write(p[0].id + ',' + p [1].id + '\n')
+
 def compute_whether_children_of_nodes_should_be_merged_at_level(nodes_dict, level):
   nodes = [v for k, v in nodes_dict.items() if v.level() == level]
 
   merge_count = 0
   total_count = 0
 
+  node_pairs = []
   for n in nodes:
     total_count += 1
     lc, rc = n.left_child(nodes_dict), n.right_child(nodes_dict)
@@ -80,13 +86,16 @@ def compute_whether_children_of_nodes_should_be_merged_at_level(nodes_dict, leve
       merge_count += 1
       lc.should_merge = True
       rc.should_merge = True
+      node_pairs.append((lc, rc))
   print level, merge_count, '/', total_count
-  return nodes_dict
+  return (nodes_dict, node_pairs)
 
 def compute_nodes_should_be_merged(nodes_dict, num_levels):
+  node_pairs = []
   for i in range(num_levels + 1):
-    compute_whether_children_of_nodes_should_be_merged_at_level(nodes_dict, i)
-  return nodes_dict
+    _, pairs = compute_whether_children_of_nodes_should_be_merged_at_level(nodes_dict, i)
+    node_pairs += pairs
+  return (nodes_dict, node_pairs)
 
 def compute_nodes_groups(nodes_dict):
   nodes = [v for k, v in nodes_dict.items()]
@@ -98,14 +107,18 @@ def compute_nodes_groups(nodes_dict):
 
 
 if __name__ == '__main__':
-  fin_name_1 = 'data/node-descriptor-k-n-dl-1-of-100.csv'
+  # fin_name_1 = 'data/node-descriptor-k-n-dl-1-of-100.csv'
+  fin_name_1 = 'data/node-descriptor-k-n-dl.csv'
   fin_name_2 = 'data/partition-tree-yoav.csv'
-  fout_name = 'data/partition-tree-nid-coord-thres-k-n-dl-gid-1-of-100.csv'
+  # fout_name = 'data/partition-tree-nid-coord-thres-k-n-dl-gid-1-of-100.csv'
+  fout_name1 = 'data/partition-tree-nid-coord-thres-k-n-dl-m.csv'
+  fout_name2 = 'data/node-pairs-should-merge-using-mdl.csv'
   num_levels = 9
 
   nodes_dict = read_node_descriptors_from_csv(fin_name_1)
   join_node_spatial_info_from_csv(nodes_dict, fin_name_2)
-  compute_nodes_should_be_merged(nodes_dict, num_levels)
+  _, node_pairs = compute_nodes_should_be_merged(nodes_dict, num_levels)
   compute_nodes_groups(nodes_dict)
 
-  write_nodes_to_csv(nodes_dict, fout_name)
+  write_nodes_to_csv(nodes_dict, fout_name1)
+  write_node_pairs_should_merge_to_csv(node_pairs, fout_name2)
