@@ -39,27 +39,22 @@ def str2flt(vec):
             newvec.append(newv)
     return newvec
 
-class BasicProtocolJob(MRJob):
-
-    # get input as raw strings
+class ksTest(MRJob):
     INPUT_PROTOCOL = mrjob.protocol.RawValueProtocol
-    # pass data internally with pickle
     INTERNAL_PROTOCOL = mrjob.protocol.PickleProtocol
-    # write output as JSON
     OUTPUT_PROTOCOL = mrjob.protocol.JSONProtocol
-
-class ksTest(MRJob):        
+    
     def datasplit_mapper(self,_,line):
         try:
             rec = line.split(",")
-            node=rec[0]
+            node=rec[0] # exisits a root node with node id ''
             tminLen=int(rec[1])
             tmaxLen=int(rec[2])
             tmin = rec[3:3+tminLen]
             tmin = [np.float(t) for t in tmin]
             tmax = rec[3+tminLen:]
             tmax = [np.float(t) for t in tmax]
-#             stderr.write(node+"\t"+str(tmin[:3])+"\t"+str(tmax[:3])+"\n")
+#             stderr.write(node+"\t"+str(tmin[:3])+"\t"+str(tmax[:3])+"\n"
             yield "TMIN",(node,tmin)
 #             yield ("TMAX",node),tmax
         except Exception, e:
@@ -71,35 +66,24 @@ class ksTest(MRJob):
             vals = list(value)
             rec = {}
             for v in vals:
-                rec[v[0]]=v[1]
-#                 stderr.write("ksTest\t"+str(v[0])+"\t"+str(v[1][:5])+"\n")
+                if v[0]!='': # filter out the root node
+                    rec[v[0]]=v[1]
             nodeList=rec.keys()
+#             stderr.write("len of nodeList:\t"+str(len(nodeList))+"\n")
             for key in nodeList:
                 sib = key[:-1]+str(1-int(key[-1]))
                 if sib in nodeList:
-#                     stderr.write(key+'\t'+sib+'\n')
+#                     stderr.write("sid in nodeList:\t"+key+'\t'+sib+'\n')
                     kst,p = stats.ks_2samp(rec[key],rec[sib])
-                    if p>0.05:
+                    if p>0.01:
                         yield (key,sib),p
         except Exception, e:
             stderr.write(str(e))
-#     def sortbymeasstn_reducer(self,key,value):
-#         try:
-#             meas,node=key
-#             vals = list(value)
-# #             leftChild=
-# #             stats.ks_2samp()
-#             if len(vals)>30:
-#                 yield node,vals
-#         except Exception, e:
-#             stderr.write(str(e))
+
     def steps(self):
         return [
             self.mr(mapper=self.datasplit_mapper,
                     reducer=self.ksTest_reducer),
-#             self.mr(reducer=self.ksTest_reducer),
-#                     reducer=self.ksTest_reducer),
-#             self.mr(mapper=self.ksTest_mapper)
         ]
 
 if __name__ == '__main__':
